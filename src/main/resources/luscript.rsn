@@ -1,0 +1,164 @@
+rule comment /\s*;[^\n]+(?:\n|$)/;
+
+rule literal_string /\s*"/ {
+    enter string;
+}
+
+rule literal_string_one /\s*"/ {
+    visit string;
+}
+
+context string {
+    /\\./ {
+        grab text;
+    }
+
+    /"/ {
+        exit;
+    }
+
+    /[^\\"]+/ {
+        grab text;
+    }
+}
+
+rule literal_int /\s*(\d+)/ {
+    take int;
+}
+
+context float;
+
+rule literal_float /\s*(\d+)(?:[dD]|\.(\d+)[dD]?)/ {
+    enter float;
+    take float_integral;
+    take float_decimal;
+    exit;
+}
+
+rule literal_list /\s*\[/ {
+    enter list;
+}
+
+rule literal_list_one /\s*\[/ {
+    visit list;
+}
+
+context list {
+    /\s*]/ {
+        exit;
+    }
+
+    /\s*:/ {
+        enter list_middle;
+    }
+
+    closure;
+    function_call;
+    literal_string;
+    literal_int;
+    literal_float;
+    literal_list;
+    identifier;
+}
+
+context list_middle {
+    /\s*]/ {
+        exit 2;
+    }
+
+    /\s*:/ {
+        enter list_end;
+    }
+
+    closure;
+    function_call;
+    literal_string;
+    literal_int;
+    literal_float;
+    literal_list;
+    identifier;
+}
+
+context list_end {
+    /\s*]/ {
+        exit 3;
+    }
+
+    closure;
+    function_call;
+    literal_string;
+    literal_int;
+    literal_float;
+    literal_list;
+    identifier;
+}
+
+rule identifier /\s*([\w_]+|\$+\d*)/ {
+    take identifier;
+}
+
+rule identifier_function /\s*([\w_]+|\$+\d*|[+\-*\/%=&|^]|[><]=?)/ {
+    take identifier;
+}
+
+rule closure /\s*\{/ {
+    enter closure;
+    enter closure_expr;
+}
+
+context closure {
+    /\s*}/ {
+        exit;
+    }
+}
+
+rule closure_one /\s*\{/ {
+    visit closure;
+    enter closure_expr;
+}
+
+context closure_expr {
+    function_call_one;
+    literal_string_one;
+    *literal_int;
+    *literal_float;
+    literal_list_one;
+    *identifier;
+}
+
+rule function_call /\s*\(/ {
+    enter function_call;
+    enter function_call_head;
+}
+
+rule function_call_one /\s*\(/ {
+    visit function_call;
+    enter function_call_head;
+}
+
+context function_call {
+    comment;
+
+    /\s*\)/ {
+        exit;
+    }
+
+    closure;
+    function_call;
+    literal_string;
+    literal_int;
+    literal_float;
+    literal_list;
+    identifier;
+}
+
+context function_call_head {
+    comment;
+    closure_one;
+    *identifier_function;
+}
+
+context root {
+    comment;
+    function_call;
+}
