@@ -28,7 +28,6 @@ public class ObjectRegistry {
     @SuppressWarnings("unchecked")
     public <T extends IValue<T>> T resolve(String name) throws InterpretationException {
         if (registry.containsKey(name)) return (T)registry.get(name);
-        System.out.println(registry.keySet());
         throw new ResolutionIE(name);
     }
 
