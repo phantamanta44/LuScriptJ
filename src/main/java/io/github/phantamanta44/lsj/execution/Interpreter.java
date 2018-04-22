@@ -41,7 +41,12 @@ public class Interpreter {
     public void execute(String src) throws InterpretationException {
         List<IRootCall> calls = compile(parse(src));
         ExecutionContext context = new ExecutionContext();
-        for (IRootCall call : calls) call.performCall(context);
+        try {
+            for (IRootCall call : calls) call.performCall(context);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof InterpretationException) throw (InterpretationException)e.getCause();
+            throw e;
+        }
     }
 
 }

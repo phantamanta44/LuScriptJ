@@ -14,7 +14,7 @@ public class EmptyValue extends AbstractValue<EmptyValue> {
     }
 
     @Override
-    public String toString() {
+    public String asDisplayString(ExecutionContext ctx) {
         return "empty";
     }
 

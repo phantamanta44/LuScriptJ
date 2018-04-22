@@ -59,6 +59,7 @@ context list {
     literal_float;
     literal_list;
     identifier;
+    identifier_function;
 }
 
 context list_middle {
@@ -77,6 +78,7 @@ context list_middle {
     literal_float;
     literal_list;
     identifier;
+    identifier_function;
 }
 
 context list_end {
@@ -91,6 +93,7 @@ context list_end {
     literal_float;
     literal_list;
     identifier;
+    identifier_function;
 }
 
 rule identifier /\s*([\w_]+|\$+\d*)/ {
@@ -124,6 +127,7 @@ context closure_expr {
     *literal_float;
     literal_list_one;
     *identifier;
+    identifier_function;
 }
 
 rule function_call /\s*\(/ {
@@ -150,6 +154,7 @@ context function_call {
     literal_float;
     literal_list;
     identifier;
+    identifier_function;
 }
 
 context function_call_head {

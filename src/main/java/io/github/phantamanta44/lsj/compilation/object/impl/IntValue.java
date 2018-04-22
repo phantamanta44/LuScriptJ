@@ -19,12 +19,12 @@ public class IntValue extends NumeralValue<IntValue> {
     }
 
     @Override
-    public double getAsDouble() {
+    public double asDouble() {
         return value;
     }
 
     @Override
-    public String toString() {
+    public String asDisplayString(ExecutionContext ctx) {
         return Integer.toString(value);
     }
 

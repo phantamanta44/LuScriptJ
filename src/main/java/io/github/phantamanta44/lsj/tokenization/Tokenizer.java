@@ -1,7 +1,7 @@
 package io.github.phantamanta44.lsj.tokenization;
 
-import io.github.phantamanta44.resyn.parser.Parser;
 import io.github.phantamanta44.resyn.parser.ParsingException;
+import io.github.phantamanta44.resyn.parser.Syntax;
 import io.github.phantamanta44.resyn.parser.token.TokenContainer;
 
 import java.io.BufferedInputStream;
@@ -16,15 +16,15 @@ public class Tokenizer {
             int character;
             while ((character = in.read()) != -1)
                 sb.append((char)character);
-            return new Tokenizer(Parser.create(sb.toString()));
+            return new Tokenizer(Syntax.create(sb.toString()));
         } catch (ParsingException | IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private final Parser parser;
+    private final Syntax parser;
 
-    private Tokenizer(Parser parser) {
+    private Tokenizer(Syntax parser) {
         this.parser = parser;
     }
 

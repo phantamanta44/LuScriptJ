@@ -33,7 +33,7 @@ public abstract class ListComprehension extends AbstractExpression<ListValue> {
             int iStep = step != null ? step.resolve(ctx).getValue() : 1;
             List<IExpression<?>> elements = new LinkedList<>();
             for (int i = iStart; i < iEnd; i += iStep) elements.add(new IntValue(i));
-            return ListValue.construct(elements);
+            return ListValue.construct(elements); // TODO use a lazy list
         }
 
     }
@@ -57,7 +57,7 @@ public abstract class ListComprehension extends AbstractExpression<ListValue> {
             double fStep = step != null ? step.resolve(ctx).getValue() : 1D;
             List<IExpression<?>> elements = new LinkedList<>();
             for (double i = fStart; i < fEnd; i += fStep) elements.add(new FloatValue(i));
-            return ListValue.construct(elements);
+            return ListValue.construct(elements); // TODO use a lazy list
         }
 
     }

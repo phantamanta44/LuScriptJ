@@ -21,12 +21,12 @@ public class FloatValue extends NumeralValue<FloatValue> {
     }
 
     @Override
-    public double getAsDouble() {
+    public double asDouble() {
         return value;
     }
 
     @Override
-    public String toString() {
+    public String asDisplayString(ExecutionContext ctx) {
         return Double.toString(value);
     }
 

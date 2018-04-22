@@ -1,12 +1,12 @@
 package io.github.phantamanta44.lsj.tokenization.node;
 
-import io.github.phantamanta44.resyn.parser.token.IToken;
+import io.github.phantamanta44.resyn.parser.token.Token;
 import io.github.phantamanta44.resyn.parser.token.TokenContainer;
 import io.github.phantamanta44.resyn.parser.token.TokenNode;
 
 public interface INode {
 
-    static INode traverse(IToken token) {
+    static INode traverse(Token token) {
         switch (token.getName()) {
             case "closure":
                 return NodeClosure.traverse((TokenContainer)token);

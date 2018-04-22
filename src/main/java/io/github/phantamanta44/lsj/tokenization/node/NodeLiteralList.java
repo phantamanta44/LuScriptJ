@@ -1,6 +1,6 @@
 package io.github.phantamanta44.lsj.tokenization.node;
 
-import io.github.phantamanta44.resyn.parser.token.IToken;
+import io.github.phantamanta44.resyn.parser.token.Token;
 import io.github.phantamanta44.resyn.parser.token.TokenContainer;
 
 import java.util.List;
@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 public class NodeLiteralList implements INode {
 
     public static NodeLiteralList traverse(TokenContainer token) {
-        List<IToken> children = token.getChildren();
+        List<Token> children = token.getChildren();
         if (children.get(children.size() - 1).getName().equals("list_middle")) {
             if (children.size() != 2) throw new IllegalStateException("Invalid list range start");
-            List<IToken> subChildren = ((TokenContainer)children.get(1)).getChildren();
+            List<Token> subChildren = ((TokenContainer)children.get(1)).getChildren();
             if (subChildren.get(subChildren.size() - 1).getName().equals("list_end")) {
                 if (subChildren.size() != 2) throw new IllegalStateException("Invalid list range end");
-                List<IToken> subSubChildren = ((TokenContainer)subChildren.get(1)).getChildren();
+                List<Token> subSubChildren = ((TokenContainer)subChildren.get(1)).getChildren();
                 if (subSubChildren.size() != 1) throw new IllegalStateException("Invalid list range step");
                 return new Range(INode.traverse(children.get(0)),
                         INode.traverse(subChildren.get(0)),

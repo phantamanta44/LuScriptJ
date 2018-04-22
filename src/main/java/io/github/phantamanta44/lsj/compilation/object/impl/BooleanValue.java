@@ -19,6 +19,11 @@ public class BooleanValue extends AbstractValue<BooleanValue> {
     }
 
     @Override
+    public String asDisplayString(ExecutionContext ctx) throws InterpretationException {
+        return Boolean.toString(value);
+    }
+
+    @Override
     public boolean isEqualTo(ExecutionContext ctx, IValue<?> other) throws InterpretationException {
         return other.instanceOf(BuiltIns.T_BOOL) && BuiltIns.T_BOOL.cast(other).value == value;
     }

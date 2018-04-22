@@ -52,7 +52,7 @@ public class Closure<T extends Closure<T, R>, R extends IValue<R>>
     }
 
     @Override
-    public String toString() {
+    public String asDisplayString(ExecutionContext ctx) {
         return getType().getName();
     }
 

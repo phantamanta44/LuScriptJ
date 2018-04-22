@@ -8,6 +8,6 @@ public abstract class NumeralValue<T extends NumeralValue<T>> extends AbstractVa
         super(type);
     }
 
-    public abstract double getAsDouble();
+    public abstract double asDouble();
     
 }

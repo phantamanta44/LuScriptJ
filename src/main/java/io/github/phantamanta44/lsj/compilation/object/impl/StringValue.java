@@ -19,7 +19,7 @@ public class StringValue extends AbstractValue<StringValue> {
     }
 
     @Override
-    public String toString() {
+    public String asDisplayString(ExecutionContext ctx) {
         return value;
     }
 
