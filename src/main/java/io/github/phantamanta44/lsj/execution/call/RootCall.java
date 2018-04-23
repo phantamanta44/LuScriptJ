@@ -1,6 +1,7 @@
 package io.github.phantamanta44.lsj.execution.call;
 
 import io.github.phantamanta44.lsj.InterpretationException;
+import io.github.phantamanta44.lsj.compilation.object.IValue;
 import io.github.phantamanta44.lsj.execution.ExecutionContext;
 
 public abstract class RootCall {
@@ -20,6 +21,6 @@ public abstract class RootCall {
         return pos;
     }
 
-    public abstract void performCall(ExecutionContext ctx) throws InterpretationException;
+    public abstract IValue<?> performCall(ExecutionContext ctx) throws InterpretationException;
 
 }

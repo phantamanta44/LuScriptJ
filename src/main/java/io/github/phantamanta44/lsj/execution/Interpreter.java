@@ -2,6 +2,7 @@ package io.github.phantamanta44.lsj.execution;
 
 import io.github.phantamanta44.lsj.InterpretationException;
 import io.github.phantamanta44.lsj.compilation.Compiler;
+import io.github.phantamanta44.lsj.compilation.object.IValue;
 import io.github.phantamanta44.lsj.execution.call.RootCall;
 import io.github.phantamanta44.lsj.tokenization.TokenMarshal;
 import io.github.phantamanta44.lsj.tokenization.Tokenizer;
@@ -17,7 +18,7 @@ public class Interpreter {
     private final Tokenizer tokenizer;
 
     public Interpreter() {
-        this.tokenizer = Tokenizer.create();
+        this.tokenizer = Tokenizer.get();
     }
 
     public List<Node> parse(String src) throws InterpretationException {
@@ -38,21 +39,26 @@ public class Interpreter {
         return compiler.getOutput();
     }
 
-    public void execute(String src) throws InterpretationException {
-        List<RootCall> calls = compile(parse(src));
-        ExecutionContext context = new ExecutionContext();
-        for (RootCall call : calls) {
-            try {
-                call.performCall(context);
-            } catch (InterpretationException e) {
-                throw e.withFrame("<root>", call.getLine(), call.getPos());
-            } catch (RuntimeException e) {
-                if (e.getCause() instanceof InterpretationException) {
-                    throw ((InterpretationException)e.getCause()).withFrame("<root>", call.getLine(), call.getPos());
-                }
-                throw e;
+    public IValue<?> execute(RootCall call, ExecutionContext ctx) throws InterpretationException {
+        try {
+            return call.performCall(ctx);
+        } catch (InterpretationException e) {
+            throw e.withFrame("<root>", call.getLine(), call.getPos());
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof InterpretationException) {
+                throw ((InterpretationException)e.getCause()).withFrame("<root>", call.getLine(), call.getPos());
             }
+            throw e;
         }
+    }
+
+    public void execute(List<RootCall> calls) throws InterpretationException {
+        ExecutionContext context = new ExecutionContext();
+        for (RootCall call : calls) execute(call, context);
+    }
+
+    public void execute(String src) throws InterpretationException {
+        execute(compile(parse(src)));
     }
 
 }
