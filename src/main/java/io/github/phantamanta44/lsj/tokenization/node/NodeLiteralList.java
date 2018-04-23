@@ -6,7 +6,7 @@ import io.github.phantamanta44.resyn.parser.token.TokenContainer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NodeLiteralList implements INode {
+public class NodeLiteralList extends Node {
 
     public static NodeLiteralList traverse(TokenContainer token) {
         List<Token> children = token.getChildren();
@@ -17,39 +17,45 @@ public class NodeLiteralList implements INode {
                 if (subChildren.size() != 2) throw new IllegalStateException("Invalid list range end");
                 List<Token> subSubChildren = ((TokenContainer)subChildren.get(1)).getChildren();
                 if (subSubChildren.size() != 1) throw new IllegalStateException("Invalid list range step");
-                return new Range(INode.traverse(children.get(0)),
-                        INode.traverse(subChildren.get(0)),
-                        INode.traverse(subSubChildren.get(0)));
+                return new Range(token, Node.traverse(children.get(0)),
+                        Node.traverse(subChildren.get(0)),
+                        Node.traverse(subSubChildren.get(0)));
             }
             if (subChildren.size() != 1) throw new IllegalStateException("Invalid list range end");
-            return new Range(INode.traverse(children.get(0)), INode.traverse(subChildren.get(0)), null);
+            return new Range(token, Node.traverse(children.get(0)), Node.traverse(subChildren.get(0)), null);
         } else {
-            return new Literal(children.stream().map(INode::traverse).collect(Collectors.toList()));
+            return new Literal(token, children.stream().map(Node::traverse).collect(Collectors.toList()));
         }
+    }
+
+    private NodeLiteralList(Token src) {
+        super(src);
     }
 
     public static class Literal extends NodeLiteralList {
 
-        public final List<INode> elements;
+        public final List<Node> elements;
 
-        public Literal(List<INode> elements) {
+        public Literal(Token src, List<Node> elements) {
+            super(src);
             this.elements = elements;
         }
 
         @Override
         public String toString() {
-            return String.format("[%s]", elements.stream().map(INode::toString).collect(Collectors.joining(" ")));
+            return String.format("[%s]", elements.stream().map(Node::toString).collect(Collectors.joining(" ")));
         }
 
     }
 
     public static class Range extends NodeLiteralList {
 
-        public final INode start;
-        public final INode end;
-        public final INode step;
+        public final Node start;
+        public final Node end;
+        public final Node step;
 
-        public Range(INode start, INode end, INode step) {
+        public Range(Token src, Node start, Node end, Node step) {
+            super(src);
             this.start = start;
             this.end = end;
             this.step = step;

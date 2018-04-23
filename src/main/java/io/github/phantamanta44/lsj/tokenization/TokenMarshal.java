@@ -1,7 +1,7 @@
 package io.github.phantamanta44.lsj.tokenization;
 
 import io.github.phantamanta44.lsj.InterpretationException;
-import io.github.phantamanta44.lsj.tokenization.node.INode;
+import io.github.phantamanta44.lsj.tokenization.node.Node;
 import io.github.phantamanta44.lsj.tokenization.node.NodeFunctionCall;
 import io.github.phantamanta44.resyn.parser.token.Token;
 import io.github.phantamanta44.resyn.parser.token.TokenContainer;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class TokenMarshal {
 
-    public static List<INode> traverse(TokenContainer tRoot) throws InterpretationException {
+    public static List<Node> traverse(TokenContainer tRoot) throws InterpretationException {
         try {
             return tRoot.getChildren().stream()
                     .map(tRootToken -> {

@@ -25,7 +25,7 @@ public class Main {
             try {
                 new Interpreter().execute(src);
             } catch (InterpretationException e) {
-                System.err.println(e.getMessage());
+                System.err.println(e.getFullMessage());
             }
         }
     }

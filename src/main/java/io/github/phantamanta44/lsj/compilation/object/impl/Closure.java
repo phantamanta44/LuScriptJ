@@ -16,11 +16,14 @@ public class Closure<T extends Closure<T, R>, R extends IValue<R>>
 
     private final IExpression<R> expression;
     private final Type<R> returnType;
+    private final int line, pos;
 
-    public Closure(IExpression<R> expression, Type<R> returnType) {
+    public Closure(IExpression<R> expression, Type<R> returnType, int line, int pos) {
         super(BuiltIns.closureType(returnType));
         this.expression = expression;
         this.returnType = returnType;
+        this.line = line;
+        this.pos = pos;
     }
 
     @Override
@@ -40,7 +43,12 @@ public class Closure<T extends Closure<T, R>, R extends IValue<R>>
             }
         }
         ctx.incrementClosureDepth();
-        R value = expression.resolve(ctx);
+        R value;
+        try {
+            value = expression.resolve(ctx);
+        } catch (InterpretationException e) {
+            throw e.withFrame(null, line, pos);
+        }
         ctx.decrementClosureDepth();
         for (String binding : bindings) ctx.getObjRegistry().clear(binding);
         return value;

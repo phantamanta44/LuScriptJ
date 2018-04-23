@@ -13,4 +13,12 @@ public interface IExpression<T extends IValue<T>> {
         return getType().isOrIsChildOf(type);
     }
 
+    default int getDeclarationLine() {
+        return -1;
+    }
+
+    default int getDeclarationPos() {
+        return -1;
+    }
+
 }

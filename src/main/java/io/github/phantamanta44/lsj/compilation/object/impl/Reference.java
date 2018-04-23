@@ -10,22 +10,29 @@ import io.github.phantamanta44.lsj.execution.ExecutionContext;
 public class Reference<T extends IValue<T>> extends AbstractExpression<T> {
 
     private final String identifier;
+    private final int line, pos;
 
-    public Reference(String identifier, Type<T> type) {
+    public Reference(String identifier, Type<T> type, int line, int pos) {
         super(type);
         this.identifier = identifier;
+        this.line = line;
+        this.pos = pos;
     }
 
     @Override
     public T resolve(ExecutionContext ctx) throws InterpretationException {
-        return ctx.getObjRegistry().resolve(identifier);
+        try {
+            return ctx.getObjRegistry().resolve(identifier);
+        } catch (InterpretationException e) {
+            throw e.from(line, pos);
+        }
     }
 
     public static class Function<T extends ICallable<T, R>, R extends IValue> extends Reference<T> {
 
         @SuppressWarnings("unchecked")
-        public Function(String identifier, Type<R> returnType) {
-            super(identifier, BuiltIns.closureType(returnType));
+        public Function(String identifier, Type<R> returnType, int line, int pos) {
+            super(identifier, BuiltIns.closureType(returnType), line, pos);
         }
 
     }

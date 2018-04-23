@@ -7,19 +7,21 @@ import io.github.phantamanta44.resyn.parser.token.TokenContainer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NodeFunctionCall implements INode {
+public class NodeFunctionCall extends Node {
 
     public static NodeFunctionCall traverse(TokenContainer token) {
         List<Token> children = token.getChildren();
         Token tCallable = children.get(0);
-        List<INode> params = children.stream().skip(1).map(INode::traverse).collect(Collectors.toList());
-        return new NodeFunctionCall(ICallableNode.traverse(((TokenContainer)tCallable).getChildren().get(0)), params);
+        List<Node> params = children.stream().skip(1).map(Node::traverse).collect(Collectors.toList());
+        return new NodeFunctionCall(
+                token, ICallableNode.traverse(((TokenContainer)tCallable).getChildren().get(0)), params);
     }
 
     public final ICallableNode function;
-    public final List<INode> params;
+    public final List<Node> params;
 
-    public NodeFunctionCall(ICallableNode function, List<INode> params) {
+    public NodeFunctionCall(Token src, ICallableNode function, List<Node> params) {
+        super(src);
         this.function = function;
         this.params = params;
     }
@@ -27,7 +29,7 @@ public class NodeFunctionCall implements INode {
     @Override
     public String toString() {
         return String.format("%s(%s)", function.toString(),
-                params.stream().map(INode::toString).collect(Collectors.joining(", ")));
+                params.stream().map(Node::toString).collect(Collectors.joining(", ")));
     }
 
 }

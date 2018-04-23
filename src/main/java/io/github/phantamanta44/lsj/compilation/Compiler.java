@@ -5,7 +5,7 @@ import io.github.phantamanta44.lsj.compilation.object.ICallable;
 import io.github.phantamanta44.lsj.compilation.object.IExpression;
 import io.github.phantamanta44.lsj.compilation.object.IValue;
 import io.github.phantamanta44.lsj.compilation.object.impl.*;
-import io.github.phantamanta44.lsj.execution.call.IRootCall;
+import io.github.phantamanta44.lsj.execution.call.RootCall;
 import io.github.phantamanta44.lsj.execution.call.RootFunctionCall;
 import io.github.phantamanta44.lsj.execution.exception.TypeIE;
 import io.github.phantamanta44.lsj.tokenization.model.ICallableNode;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Compiler {
 
-    private final List<IRootCall> rootCalls;
+    private final List<RootCall> rootCalls;
 
     public Compiler() {
         this.rootCalls = new LinkedList<>();
@@ -28,10 +28,12 @@ public class Compiler {
     private <T extends ICallable<T, R>, R extends IValue<R>> IExpression<T> produceCallable(ICallableNode node)
             throws InterpretationException {
         if (node instanceof NodeReference) {
-            return new Reference.Function<T, R>(((NodeReference)node).identifier, BuiltIns.anyType());
+            NodeReference ref = (NodeReference)node;
+            return new Reference.Function<T, R>(ref.identifier, BuiltIns.anyType(), ref.getLine(), ref.getPos());
         } else if (node instanceof NodeClosure) {
-            IExpression expr = produceExpression(((NodeClosure)node).expression);
-            return new Closure<>(expr, expr.getType());
+            NodeClosure closure = (NodeClosure)node;
+            IExpression expr = produceExpression(closure.expression);
+            return new Closure<>(expr, expr.getType(), closure.getLine(), closure.getPos());
         }
         throw new IllegalStateException("Nonexistent callable node!");
     }
@@ -40,15 +42,15 @@ public class Compiler {
     private <T extends ICallable<T, R>, R extends IValue<R>> CallResult<T, R> produceCallResult(NodeFunctionCall node)
             throws InterpretationException {
         List<IExpression<?>> params = new ArrayList<>();
-        for (INode paramNode : node.params) params.add(produceExpression(paramNode));
-        return new CallResult<>(this.<T, R>produceCallable(node.function), params);
+        for (Node paramNode : node.params) params.add(produceExpression(paramNode));
+        return new CallResult<>(this.<T, R>produceCallable(node.function), params, node.getLine(), node.getPos());
     }
 
     @SuppressWarnings("unchecked")
-    private IExpression<?> produceExpression(INode node) throws InterpretationException {
+    private IExpression<?> produceExpression(Node node) throws InterpretationException {
         if (node instanceof NodeClosure) {
             IExpression expr = produceExpression(((NodeClosure)node).expression);
-            return new Closure<>(expr, expr.getType());
+            return new Closure<>(expr, expr.getType(), node.getLine(), node.getPos());
         } else if (node instanceof NodeFunctionCall) {
             return produceCallResult((NodeFunctionCall)node);
         } else if (node instanceof NodeLiteralFloat) {
@@ -57,7 +59,7 @@ public class Compiler {
             return new IntValue(((NodeLiteralInt)node).value);
         } else if (node instanceof NodeLiteralList) {
             if (node instanceof NodeLiteralList.Literal) {
-                List<INode> values = ((NodeLiteralList.Literal)node).elements;
+                List<Node> values = ((NodeLiteralList.Literal)node).elements;
                 if (values.isEmpty()) return new ListValue(null, null);
                 ListValue list = new ListValue(produceExpression(values.get(values.size() - 1)), null);
                 for (int i = values.size() - 2; i >= 0; i--) {
@@ -92,16 +94,16 @@ public class Compiler {
         } else if (node instanceof NodeLiteralString) {
             return new StringValue(Utils.parseEscapes(((NodeLiteralString)node).value));
         } else if (node instanceof NodeReference) {
-            return new Reference<>(((NodeReference)node).identifier, BuiltIns.T_ANY);
+            return new Reference<>(((NodeReference)node).identifier, BuiltIns.T_ANY, node.getLine(), node.getPos());
         }
         throw new IllegalStateException("Nonexistent expression node!");
     }
 
     public void acceptFunctionCall(NodeFunctionCall node) throws InterpretationException {
-        rootCalls.add(new RootFunctionCall(produceCallResult(node)));
+        rootCalls.add(new RootFunctionCall(produceCallResult(node), node.getLine(), node.getPos()));
     }
 
-    public List<IRootCall> getOutput() {
+    public List<RootCall> getOutput() {
         return rootCalls;
     }
 
